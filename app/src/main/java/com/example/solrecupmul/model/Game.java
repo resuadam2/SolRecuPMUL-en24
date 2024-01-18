@@ -10,6 +10,12 @@ public class Game {
             "Android","IOs", "Nintendo DS", "GameBoy", "GameBoy Advance"
     };
 
+    public static final String [] platformsWithoutAll = {
+            "PlayStation 1","PlayStation 2","PlayStation 3","PlayStation4","PlayStation 5",
+            "PC", "XBOX","XBOX 360", "Nintendo Switch", "Nintendo Wii", "XBOX SERIES X",
+            "Android","IOs", "Nintendo DS", "GameBoy", "GameBoy Advance"
+    };
+
     public static int getPlatformIndex(String platform)
     {
         for (int i = 0; i < platforms.length; i++)

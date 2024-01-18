@@ -23,6 +23,14 @@ public class GameAdapter extends BaseAdapter {
         this.layout = layout;
     }
 
+    public void setGames(ArrayList<Game> games) {
+        this.games = games;
+    }
+
+    public ArrayList<Game> getGames() {
+        return games;
+    }
+
     @Override
     public int getCount() {
         return games.size();

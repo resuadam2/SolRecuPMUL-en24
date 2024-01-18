@@ -30,6 +30,7 @@ public class MainActivity extends AppCompatActivity {
     Button addGame;
     ArrayList<Game> games;
     DBManager db;
+    GameAdapter adapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,13 +45,8 @@ public class MainActivity extends AppCompatActivity {
         addGame = findViewById(R.id.btnAdd);
 
         platforms.setAdapter(new ArrayAdapter<String>(this, android.R.layout.simple_spinner_dropdown_item, Game.platforms));
-        gamesList.setAdapter(new GameAdapter(this, games, R.layout.item_game));
-
-        SharedPreferences preferences = getSharedPreferences("preferences", MODE_PRIVATE);
-        SharedPreferences.Editor editor = preferences.edit();
-        editor.putString("searchBar", searchBar.getText().toString());
-        editor.putString("platform", (String) platforms.getSelectedItem());
-        editor.apply();
+        adapter = new GameAdapter(this, games, R.layout.item_game);
+        gamesList.setAdapter(adapter);
 
 
         searchBar.addTextChangedListener(new TextWatcher() {
@@ -92,8 +88,8 @@ public class MainActivity extends AppCompatActivity {
             startActivity(intent);
         });
 
-        gamesList.setOnLongClickListener(v -> {
-            deleteGame();
+        gamesList.setOnItemLongClickListener((parent, view, position, id) -> {
+            deleteGame(position);
             return true;
         });
 
@@ -104,15 +100,14 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    private void deleteGame() {
+    private void deleteGame(int position) {
         AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
         builder.setTitle("Delete game");
         builder.setMessage("Are you sure you want to delete this game ?");
         builder.setPositiveButton("Yes", (dialog, which) -> {
-            db.delete(games.get(gamesList.getSelectedItemPosition()).getId());
-            games = db.getAllGames();
-            gamesList.setAdapter(new GameAdapter(MainActivity.this, games, R.layout.item_game));
-            gamesList.deferNotifyDataSetChanged();
+            db.delete(adapter.getGames().get(position).getId());
+            adapter.getGames().remove(position);
+            adapter.notifyDataSetChanged();
         });
         builder.setNegativeButton("No", (dialog, which) -> dialog.cancel());
         builder.show();
@@ -121,11 +116,10 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        filterGames(searchBar.getText().toString(), (String) platforms.getSelectedItem());
         SharedPreferences preferences = getSharedPreferences("preferences", MODE_PRIVATE);
         searchBar.setText(preferences.getString("searchBar", ""));
         platforms.setSelection(((ArrayAdapter<String>) platforms.getAdapter()).getPosition(preferences.getString("platform", "All")));
-
+        filterGames(searchBar.getText().toString(), (String) platforms.getSelectedItem());
     }
 
     @Override
@@ -140,15 +134,18 @@ public class MainActivity extends AppCompatActivity {
 
     private void filterGames(String name, String platform) {
         ArrayList<Game> filteredGames = new ArrayList<>();
+        name = name.toLowerCase();
+        games = db.getAllGames();
         for (Game game : games) {
             if (name.isEmpty() && platform.equals("All")) {
                 filteredGames = games;
                 break;
             }
-            if (game.getName().contains(name) && (game.getPlatform().equals(platform) || platform.equals("All")))
+            if ((game.getName().toLowerCase().contains(name) || game.getCompany().toLowerCase().contains(name))
+                    && (game.getPlatform().equals(platform) || platform.equals("All")))
                 filteredGames.add(game);
         }
-        gamesList.setAdapter(new GameAdapter(MainActivity.this, filteredGames, R.layout.item_game));
-        gamesList.deferNotifyDataSetChanged();
+        adapter.setGames(filteredGames);
+        adapter.notifyDataSetChanged();
     }
 }

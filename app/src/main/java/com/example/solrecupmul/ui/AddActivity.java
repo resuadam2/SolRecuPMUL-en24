@@ -31,16 +31,17 @@ public class AddActivity extends AppCompatActivity {
         btnAdd = findViewById(R.id.btnSave);
         btnCancel = findViewById(R.id.btnCancel);
 
+        spPlatform.setAdapter(new ArrayAdapter<String>(this, android.R.layout.simple_spinner_dropdown_item, Game.platformsWithoutAll));
+
+
         if (getIntent().getExtras().getInt("id") != 0) {
             getIntent().getExtras().getInt("id");
             etName.setText(getIntent().getExtras().getString("name"));
             etCompany.setText(getIntent().getExtras().getString("company"));
             etYear.setText(String.valueOf(getIntent().getExtras().getInt("year")));
-            spPlatform.setSelection(Game.getPlatformIndex(getIntent().getExtras().getString("platform")));
+            spPlatform.setSelection(Game.getPlatformIndex(getIntent().getExtras().getString("platform")) - 1);
             btnAdd.setText("Update");
         }
-
-        spPlatform.setAdapter(new ArrayAdapter<String>(this, android.R.layout.simple_spinner_dropdown_item, Game.platforms));
 
         btnAdd.setOnClickListener(v -> {
             if (etName.getText().toString().isEmpty() || etCompany.getText().toString().isEmpty() || etYear.getText().toString().isEmpty())
@@ -50,9 +51,11 @@ public class AddActivity extends AppCompatActivity {
             else if (getIntent().getExtras().getInt("id") != 0) {
                 db.edit(getIntent().getExtras().getInt("id"), etName.getText().toString(), etCompany.getText().toString(), spPlatform.getSelectedItem().toString(), Integer.parseInt(etYear.getText().toString()));
                 Toast.makeText(AddActivity.this, "Game updated successfully", Toast.LENGTH_SHORT).show();
+                finish();
             } else {
                 db.insert(etName.getText().toString(), etCompany.getText().toString(), spPlatform.getSelectedItem().toString(), Integer.parseInt(etYear.getText().toString()));
                 Toast.makeText(AddActivity.this, "Game added successfully", Toast.LENGTH_SHORT).show();
+                finish();
             }
         });
 
