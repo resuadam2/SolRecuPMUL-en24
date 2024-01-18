@@ -1,0 +1,12 @@
+<resources>
+    <string name="app_name">SolRecuPMUL</string>
+    <string name="add">ADD</string>
+    <string name="search_hint">Type to search</string>
+    <string name="cancel">Cancel</string>
+    <string name="Save">Save</string>
+    <string name="name">Game name</string>
+    <string name="company">Company name</string>
+    <string name="year">Year</string>
+    <string name="year_example">2005</string>
+    <string name="text_example">Text Example</string>
+</resources>
